@@ -1,4 +1,4 @@
-==Test Ansible-Tower for adding project to OCP from Cloudforms
+# Test Ansible-Tower for adding project to OCP from Cloudforms
 
 Variables:
 
