@@ -1,0 +1,47 @@
+---
+- name: Check if {{ projectname }} exists
+  command: oc get projects | grep  {{ projectname }}-dev 
+  register: project_test
+
+- name: create oc {{ projectname }}-dev
+  command: oc new-project {{ projectname }}-dev --nameselector="site=dev"
+  when: project_test|failed
+
+- name: create oc {{ projectname }}-test
+  command: oc new-project {{ projectname }}-test --nameselector="site=test"
+
+- name: create oc {{ projectname }}-prod
+  command: oc new-project {{ projectname }}-prod --nameselector="site=prod"
+
+- name: create oc {{ projectname }}-jenkins
+  command: oc new-project {{ projectname }}-jenkins --nameselector="site=dev"
+
+- name: Add user as admin for {{ projectname }}-dev
+  command: oc add-role-to-user admin {{ username }} -n {{ projectname }}-dev
+
+- name: Add user as admin for {{ projectname }}-test
+  command: oc add-role-to-user admin {{ username }} -n {{ projectname }}-test
+
+- name: Add user as admin for {{ projectname }}-prod
+  command: oc add-role-to-user admin {{ username }} -n {{ projectname }}-prod
+
+- name: Add user as admin for {{ projectname }}-jenkins
+  command: oc add-role-to-user admin {{ username }} -n {{ projectname }}-jenkins
+
+- name: Add project pipeline to {{ projectname }}-dev
+  command: oc policy add-role-to-group system:image-puller system:serviceaccount:{{ projectname }}-prod -n {{ projectname }}-dev
+
+- name: Add project pipeline to {{ projectname }}-dev
+  command: oc policy add-role-to-group system:image-puller system:serviceaccount:{{ projectname }}-test -n {{ projectname }}-dev
+
+- name: Add jenkins to project {{ projectname }}-jenkins
+  command: oc new-app jenkins-persistent -n {{ projectname }}-jenkins
+
+- name: Add Jenkins role to {{ projectname }}-dev
+  command: oc policy add-role-to-user edit system:serviceaccount:{{ projectname }}-jenkins:jenkins -n {{ projectname }}-dev
+
+- name: Add Jenkins role to {{ projectname }}-test
+  command: oc policy add-role-to-user edit system:serviceaccount:{{ projectname }}-jenkins:jenkins -n {{ projectname }}-test
+
+- name: Add Jenkins role to {{ projectname }}-prod
+  command: oc policy add-role-to-user edit system:serviceaccount:{{ projectname }}-jenkins:jenkins -n {{ projectname }}-prod

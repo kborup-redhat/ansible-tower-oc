@@ -1,0 +1,6 @@
+[submodule "roles/sat6register"]
+	path = roles/sat6register
+	url = https://github.com/ldomb/ansible-role-sat6register.git
+[submodule "roles/octools"]
+	path = roles/octools
+	url = https://github.com/ldomb/ansible-role-octools.git
